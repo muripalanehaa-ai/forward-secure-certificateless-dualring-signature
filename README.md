@@ -165,9 +165,15 @@ The proposed scheme is suitable for:
 ## Author
 
 Nehaa Muripala
-
 M.Tech Computer Science and Engineering
+IIITDM Kurnool
 
+Dr. Medini H R
+PostDoc - Cryptography
+IIITDM Kurnool
+
+Dr. R Kabaleeswaran
+Assistant Professor 
 IIITDM Kurnool
 
 ---
