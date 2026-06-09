@@ -164,11 +164,11 @@ The proposed scheme is suitable for:
 
 ## Author
 
-Gabriel Robby Susmith Kari
+Nehaa Muripala
 
-B.Tech Mechanical Engineering
+M.Tech Computer Science and Engineering
 
-IIITDM Kancheepuram
+IIITDM Kurnool
 
 ---
 
