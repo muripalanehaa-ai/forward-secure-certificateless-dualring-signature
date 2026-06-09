@@ -42,7 +42,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-/* ─── Configuration ──────────────────────────────────────────────────────── */
+/* ─── Configuration ─── */
 #define MSG         "Hello, FS-Pairing Ring World!"
 #define HASH_LEN    32
 #define HVEC_LEN    6      /* hvec[0..5]  — matches Python range(0,6) */
@@ -75,7 +75,7 @@ static const int N_EPOCHS      = 20;
 
 #define N_BENCH (((BENCH_END - BENCH_START)/BENCH_STEP) + 1)
 
-/* ─── Global pairing state ───────────────────────────────────────────────── */
+/* ─── Global pairing state ─── */
 static pairing_t   G_pairing;
 static element_t   G_g;          /* generator  g  ∈ G1  */
 static element_t   G_h;          /* generator  h  ∈ G2  */
@@ -96,14 +96,14 @@ static void element_pow_zn_si(element_t out, element_t base, long exp){
     element_clear(e);
 }
 
-/* ─── Timing ─────────────────────────────────────────────────────────────── */
+/* ─── Timing ─── */
 static double now_ms(void){
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
 }
 
-/* ─── Hash helpers ───────────────────────────────────────────────────────── */
+/* ─── Hash helpers ─── */
 /*
  * Serialise a GT element to bytes, SHA-256 it, return hex string.
  * Matches Python:  sha256.update(group.serialize(R)); c_ = sha256.hexdigest()
@@ -164,7 +164,7 @@ static void hash_seed_to_zr(const char *seed, element_t out){
     );
 }
 
-/* ─── Setup ──────────────────────────────────────────────────────────────── */
+/* ─── Setup ─── */
 /*
  * Python setup():
  *   g  = random G1
@@ -208,7 +208,7 @@ static void Setup(void){
     G_initialized = 1;
 }
 
-/* ─── Data structures ────────────────────────────────────────────────────── */
+/* ─── Data structures ─── */
 
 /*
  * Secret key: SK[0] = g^r  (G1),  SK[1] = h^sk * Ft^r  (G2)
@@ -236,7 +236,7 @@ typedef struct {
     int        epoch;    /* for F(t) selection */
 } RingSig;
 
-/* ─── KeyGen ─────────────────────────────────────────────────────────────── */
+/* ─── KeyGen ─── */
 /*
  * Python keygen():
  *   sk = random Zr
@@ -271,7 +271,7 @@ static void KeyGen(UserSK *usk, UserPK *upk){
     element_pow_zn(upk->pk, G_g, usk->sk_zr);
 }
 
-/* ─── KeyUp ──────────────────────────────────────────────────────────────── */
+/* ─── KeyUp ─── */
 /*
  * Forward-secure key update: re-randomise with fresh z ∈ Zr.
  * (Python does not implement KeyUp; this is the paper's Section 4 addition.)
@@ -305,7 +305,7 @@ static void KeyUp(UserSK *usk){
     element_clear(z);
 }
 
-/* ─── Sign ───────────────────────────────────────────────────────────────── */
+/* ─── Sign ─── */
 /*
  * Python sign(pp, sk, pk, m):
  *   cs[0] = placeholder (signer's slot)
@@ -434,7 +434,7 @@ static RingSig *Sign(const char *m, int epoch,
     return sig;
 }
 
-/* ─── Verify ─────────────────────────────────────────────────────────────── */
+/* ─── Verify ─── */
 /*
  * Python verify():
  *   A     = pair(g, σ1)
@@ -517,7 +517,7 @@ static int Verify(const char *m, const RingSig *sig, UserPK *pks, int n){
     return ok;
 }
 
-/* ─── Memory helpers ─────────────────────────────────────────────────────── */
+/* ─── Memory helpers ─── */
 static void free_sig(RingSig *s){
     if(!s) return;
     element_clear(s->sigma1);
@@ -546,9 +546,7 @@ static void free_keys(UserSK *sks, UserPK *pks, int n){
 //     element_clear(e);
 // }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   MAIN
-   ══════════════════════════════════════════════════════════════════════════ */
+/* ─── MAIN ─── */
 int main(void){
     printf("Forward-Secure PBC Ring Signature — Dynamic Benchmark\n");
     printf("Initialising pairing (Type-A, 160-bit r)...\n");
@@ -560,7 +558,7 @@ int main(void){
     FILE *f_epoch = fopen("results_epochs_fsdr_pairing.csv",     "w");
     FILE *f_bench = fopen("results_bench_iter_fsdr_pairing.csv", "w");
 
-    /* ══ 1. Ring Size Sweep (epoch=1, iters=100) ════════════════════════════ */
+    /* ─── 1. Ring Size Sweep (epoch=1, iters=100) ─── */
     fprintf(f_ring, "ring_size,sign_ms,verify_ms,sig_bytes\n");
     printf("=== SWEEP 1: Ring Size ===\n");
     printf("%-12s %-12s %-12s %-12s\n","ring_size","sign_ms","verify_ms","sig_bytes");
@@ -599,7 +597,7 @@ int main(void){
     }
     fclose(f_ring);
 
-    /* ══ 2. Epoch Sweep (n=4, iters=50) ════════════════════════════════════ */
+    /* ─── 2. Epoch Sweep (n=4, iters=50) ─── */
     fprintf(f_epoch,"epoch,sign_ms,verify_ms\n");
     printf("\n=== SWEEP 2: Epoch Count ===\n");
     printf("%-12s %-12s %-12s\n","epoch","sign_ms","verify_ms");
@@ -631,7 +629,7 @@ int main(void){
     }
     fclose(f_epoch);
 
-    /* ══ 3. Benchmark Iterations Sweep (n=2, epoch=1) ══════════════════════ */
+    /* ─── 3. Benchmark Iterations Sweep (n=2, epoch=1) ─── */
     fprintf(f_bench,"bench_iters,sign_ms,verify_ms\n");
     printf("\n=== SWEEP 3: Benchmark Iterations ===\n");
     printf("%-14s %-12s %-12s\n","bench_iters","sign_ms","verify_ms");
@@ -641,13 +639,6 @@ int main(void){
         UserPK *pks=(UserPK*)calloc(n,sizeof(UserPK));
         for(int i=0;i<n;i++) KeyGen(&sks[i],&pks[i]);
         for(int i=0;i<n;i++) KeyUp(&sks[i]);
-
-        
-
-        
-
-
-
         for(int bi = 0; bi < N_BENCH; bi++){
             int iters = BENCH_START + bi * BENCH_STEP;
             if(iters == 0){
@@ -693,14 +684,6 @@ int main(void){
             avg_verify
         );
     }
-
-
-
-
-
-
-
-
         free_keys(sks,pks,n); free(sks); free(pks);
     }
     fclose(f_bench);
